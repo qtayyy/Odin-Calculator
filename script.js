@@ -3,83 +3,117 @@ let	zeroButton = document.querySelector(".zero-btn");
 let	display = document.querySelector(".display");
 
 const	OPERATORS = "+-*/";
-let		saved;
-let		currOperator = "";
+let	displayed = "0";
+let	stored = "";
+let	currOperator = "";
 
 function handleOperation()
 {
+	if (displayed === "0" && stored === "")
+		return ("0");
+	if (stored === "")
+		return (displayed);
 	switch (currOperator)
 	{
 		case "+":
 		{
-			return (Number(saved) + Number(display.textContent));
+			return (Number(stored) + Number(displayed));
 		}
 		case "-":
 		{
-			return (Number(saved) - Number(display.textContent));
+			return (Number(stored) - Number(displayed));
 		}
 		case "*":
 		{
-			return (Number(saved) * Number(display.textContent));
+			return (Number(stored) * Number(displayed));
 		}
 		case "/":
 		{
-			return (Number(saved) / Number(display.textContent));
+			return (Number(stored) / Number(displayed));
 		}
 	}
 }
 
 function handleOperands(currVal)
 {
-	if (display.textContent != 0 && currOperator != "")
+	if (currOperator === "")
 	{
-		saved = display.textContent;
-		display.textContent = currVal;
+		if (displayed === "0")
+		{
+			if (currVal === ".")
+				displayed = "0."
+			else if (currVal !== "0")
+				displayed = currVal;
+		}	
+		else
+		{
+			if (currVal === "." && displayed.includes("."))
+			{
+				return;
+			}		
+			displayed += currVal;
+		}	
 	}
-	else if (display.textContent != 0 && currOperator == "")
-		display.textContent += currVal;
 	else
-		display.textContent = currVal;	
+	{
+		if (stored === "")
+		{
+			stored = displayed;
+			if (currVal === ".")
+				displayed = "0."
+			else
+				displayed = currVal;
+		}
+		else
+		{
+			if (currVal === "." && displayed.includes("."))
+				return;
+			displayed += currVal;
+		}	
+	}
 }
 
 buttonArr.forEach(button => {
 	button.addEventListener("click", (e) => {
-		const	val = e.target.textContent;
+		const	val = String(e.target.textContent);
 
 		switch (val)
 		{
 			case "AC":
 			{
-				display.textContent = 0;
+				displayed = "0";
 				saved = "";
 				currOperator = "";
 				break;
 			}	
 			case "DEL":
 			{
-				display.textContent = display.textContent.substring(0, display.textContent.length - 1);
-				if (display.textContent.length == 0)
-					display.textContent = 0;
+				displayed = displayed.substring(0, displayed.length - 1);
+				if (displayed.length == 0)
+					displayed = "0";
 				break;
 			}
 			case "%":
 			{	
-				display.textContent = display.textContent / 100;
+				displayed = displayed / 100;
 				break;
 			}
 			case "=":
 			{
-				display.textContent = handleOperation();
+				displayed = String(handleOperation());
 				currOperator = "";
+				stored = "";
 				break;
 			}
 			default:
 			{
 				if (OPERATORS.includes(val))
 				{
-					if (currOperator != "")
+					if (currOperator !== "")
 					{
-						display.textContent = handleOperation();
+						displayed = String(handleOperation());
+						currOperator = "";
+						stored = "";
 					}
 					currOperator = val;
 				}
@@ -87,14 +121,16 @@ buttonArr.forEach(button => {
 					handleOperands(val);
 			}
 		}
+		if (displayed.length > 10)
+			displayed = displayed.substring(0, 10);
+		display.textContent = displayed;
 	})
 });
 
 zeroButton.addEventListener("click", (e) => {
-	const	val = e.target.textContent;
-
-	if (display.textContent != 0)	
-		display.textContent += val;
-	else
-		display.textContent = val;	
+	const	val = String(e.target.textContent);
+	handleOperands(val);
+	if (displayed.length > 10)
+		displayed = displayed.substring(0, 10);
+	display.textContent = displayed;
 })
