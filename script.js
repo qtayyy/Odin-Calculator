@@ -6,6 +6,7 @@ const	OPERATORS = "+-*/";
 let	displayed = "0";
 let	stored = "";
 let	currOperator = "";
+let	equalPressed = false;
 
 function handleOperation()
 {
@@ -52,8 +53,14 @@ function handleOperands(currVal)
 			if (currVal === "." && displayed.includes("."))
 			{
 				return;
-			}		
-			displayed += currVal;
+			}
+			if (!equalPressed)
+				displayed += currVal;
+			else
+			{
+				displayed = currVal;
+				equalPressed = false;
+			}
 		}	
 	}
 	else
@@ -86,6 +93,7 @@ buttonArr.forEach(button => {
 				displayed = "0";
 				saved = "";
 				currOperator = "";
+				equalPressed = false;
 				break;
 			}	
 			case "DEL":
@@ -97,12 +105,14 @@ buttonArr.forEach(button => {
 			}
 			case "%":
 			{	
-				displayed = displayed / 100;
+				displayed = String(displayed / 100);
 				break;
 			}
 			case "=":
 			{
 				displayed = String(handleOperation());
+				if (displayed && stored)
+					equalPressed = true;
 				currOperator = "";
 				stored = "";
 				break;
@@ -124,7 +134,10 @@ buttonArr.forEach(button => {
 			}
 		}
 		if (displayed.length > 10)
+		{
+			alert("Overflow! Result may not be accurate!");
 			displayed = displayed.substring(0, 10);
+		}			
 		display.textContent = displayed;
 	})
 });
@@ -133,6 +146,9 @@ zeroButton.addEventListener("click", (e) => {
 	const	val = String(e.target.textContent);
 	handleOperands(val);
 	if (displayed.length > 10)
+	{
+		alert("Overflow! Result may not be accurate!");
 		displayed = displayed.substring(0, 10);
+	}
 	display.textContent = displayed;
 })
