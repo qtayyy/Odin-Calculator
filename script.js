@@ -29,6 +29,8 @@ function handleOperation()
 		}
 		case "/":
 		{
+			if (Number(displayed) === 0)
+				return "Noob";
 			return (Number(stored) / Number(displayed));
 		}
 	}
